@@ -3,38 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscriber</title>
+    <title>Subscriber Generator</title>
     <style>
-        /* Выравнивание всего содержимого строго по центру экрана */
         body {
             font-family: sans-serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             color: #333;
         }
         .menu-container {
             text-align: center;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             padding: 20px;
             box-sizing: border-box;
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        /* Стиль главного заголовка */
         h1 {
-            font-size: 28px;
-            margin-bottom: 30px;
+            font-size: 26px;
+            margin-bottom: 25px;
             font-weight: bold;
         }
-        /* Стили для кнопок-ссылок */
         .sub-button {
             display: block;
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             margin-bottom: 15px;
             background-color: #ffffff;
             color: #333333;
@@ -46,10 +47,72 @@
             box-sizing: border-box;
             transition: all 0.2s ease;
         }
-        /* Эффект при нажатии на кнопку */
         .sub-button:active {
             background-color: #333333;
             color: #ffffff;
+        }
+        
+        /* Стили для блока генератора подписок */
+        .block-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-top: 1px dashed #ccc;
+            padding-top: 20px;
+        }
+        .input-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+        }
+        .create-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+        .create-btn:active {
+            background-color: #555;
+        }
+        .result-box {
+            width: 100%;
+            height: 140px;
+            margin-top: 15px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #222;
+            color: #fff;
+            resize: none;
+            text-align: left;
         }
     </style>
 </head>
@@ -58,12 +121,58 @@
     <div class="menu-container">
         <h1>Subscriber</h1>
         
-        <!-- Кнопка для Github Subscription -->
+        <!-- Кнопки-ссылки -->
         <a href="https://gist.github.com" class="sub-button">Github Subscription</a>
-        
-        <!-- Кнопка для Pasta Subscription -->
         <a href="https://pastee.dev" class="sub-button">Pasta Subscription</a>
+        
+        <!-- Название блока -->
+        <div class="block-title">Block for Subscription</div>
+        
+        <!-- Клетка 1 -->
+        <div class="input-group">
+            <label>Subscription Name:</label>
+            <input type="text" id="subName" class="input-field" placeholder="Например: AsensioVPNS">
+        </div>
+        
+        <!-- Клетка 2 -->
+        <div class="input-group">
+            <label>Write Your Limit:</label>
+            <input type="text" id="subLimit" class="input-field" placeholder="Например: 50GB или 0">
+        </div>
+        
+        <!-- Клетка 3 (Объединенная для Web site и Support site) -->
+        <div class="input-group">
+            <label>Write Your Web Site and support site:</label>
+            <input type="text" id="webAndSupport" class="input-field" placeholder="Например: https://max.ru">
+        </div>
+
+        <!-- Кнопка Крейт -->
+        <button class="create-btn" onclick="generateConfig()">Create</button>
+
+        <!-- Длинное поле вывода кода -->
+        <textarea id="resultCode" class="result-box" readonly placeholder="Здесь появится сгенерированный блок..."></textarea>
     </div>
+
+    <script>
+        function generateConfig() {
+            // Получаем значения из клеток
+            const name = document.getElementById('subName').value || 'AsensioVPNS';
+            const limitValue = document.getElementById('subLimit').value || '0';
+            const siteUrl = document.getElementById('webAndSupport').value || 'https://max.ru';
+
+            // Генерируем блок по твоим точным правилам
+            const finalCode = 
+`# profile-title: ${name}
+#!name=${name}
+# profile-update-interval: 1
+# profile-web-page-url: ${siteUrl}
+# support-url: ${siteUrl}
+# subscription-userinfo: upload=0; download=0; total=${limitValue}`;
+
+            // Выводим полученный код в нижнюю длинную клетку
+            document.getElementById('resultCode').value = finalCode;
+        }
+    </script>
 
 </body>
 </html>
