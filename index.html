@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscriber Generator</title>
+    <title>Subscriber Manager</title>
     <style>
         body {
             font-family: sans-serif;
@@ -52,7 +52,6 @@
             color: #ffffff;
         }
         
-        /* Стили для блока генератора подписок */
         .block-title {
             font-size: 18px;
             font-weight: bold;
@@ -83,7 +82,7 @@
             box-sizing: border-box;
             background-color: #fafafa;
         }
-        .create-btn {
+        .create-btn, .copy-btn {
             width: 100%;
             padding: 14px;
             background-color: #333;
@@ -96,12 +95,18 @@
             margin-top: 10px;
             text-transform: uppercase;
         }
-        .create-btn:active {
+        .create-btn:active, .copy-btn:active {
             background-color: #555;
         }
-        .result-box {
+        .copy-btn {
+            background-color: #1a73e8; /* Синий цвет для кнопки Копировать */
+        }
+        .copy-btn:active {
+            background-color: #1557b0;
+        }
+        .result-box, .textarea-field {
             width: 100%;
-            height: 140px;
+            height: 130px;
             margin-top: 15px;
             padding: 10px;
             font-family: monospace;
@@ -109,10 +114,24 @@
             border: 2px solid #333;
             border-radius: 6px;
             box-sizing: border-box;
-            background-color: #222;
-            color: #fff;
             resize: none;
             text-align: left;
+        }
+        .result-box {
+            background-color: #222;
+            color: #fff;
+        }
+        .textarea-field {
+            background-color: #fff;
+            color: #333;
+            height: 150px;
+        }
+        .status-msg {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -121,47 +140,54 @@
     <div class="menu-container">
         <h1>Subscriber</h1>
         
-        <!-- Кнопки-ссылки -->
+        <!-- Кнопки переходов -->
         <a href="https://gist.github.com" class="sub-button">Github Subscription</a>
         <a href="https://pastee.dev" class="sub-button">Pasta Subscription</a>
         
-        <!-- Название блока -->
+        <!-- ПЕРВЫЙ БЛОК: Генерация заголовка -->
         <div class="block-title">Block for Subscription</div>
         
-        <!-- Клетка 1 -->
         <div class="input-group">
             <label>Subscription Name:</label>
             <input type="text" id="subName" class="input-field" placeholder="Например: AsensioVPNS">
         </div>
         
-        <!-- Клетка 2 -->
         <div class="input-group">
             <label>Write Your Limit:</label>
             <input type="text" id="subLimit" class="input-field" placeholder="Например: 50GB или 0">
         </div>
         
-        <!-- Клетка 3 (Объединенная для Web site и Support site) -->
         <div class="input-group">
             <label>Write Your Web Site and support site:</label>
             <input type="text" id="webAndSupport" class="input-field" placeholder="Например: https://max.ru">
         </div>
 
-        <!-- Кнопка Крейт -->
         <button class="create-btn" onclick="generateConfig()">Create</button>
+        <textarea id="resultCode" class="result-box" readonly placeholder="Здесь появится сгенерированный заголовок..."></textarea>
 
-        <!-- Длинное поле вывода кода -->
-        <textarea id="resultCode" class="result-box" readonly placeholder="Здесь появится сгенерированный блок..."></textarea>
+        <!-- ВТОРОЙ БЛОК: Добавление кодов и копирование -->
+        <div class="block-title">Submit Your Code:</div>
+        
+        <div class="input-group">
+            <label>Вставь сюда свои VPN ссылки (каждую с новой строки):</label>
+            <textarea id="userCodes" class="textarea-field" placeholder="trojan://...&#10;vless://...&#10;hysteria2://..."></textarea>
+        </div>
+
+        <button class="copy-btn" onclick="combineAndCopy()">Объединить и Копировать</button>
+        <div id="status" class="status-msg">Скопировано в буфер обмена! 👍</div>
     </div>
 
     <script>
+        // Переменная для хранения заголовка подписки
+        let generatedHeader = "";
+
         function generateConfig() {
-            // Получаем значения из клеток
             const name = document.getElementById('subName').value || 'AsensioVPNS';
             const limitValue = document.getElementById('subLimit').value || '0';
             const siteUrl = document.getElementById('webAndSupport').value || 'https://max.ru';
 
-            // Генерируем блок по твоим точным правилам
-            const finalCode = 
+            // Формируем вчерашний блок заголовка
+            generatedHeader = 
 `# profile-title: ${name}
 #!name=${name}
 # profile-update-interval: 1
@@ -169,8 +195,32 @@
 # support-url: ${siteUrl}
 # subscription-userinfo: upload=0; download=0; total=${limitValue}`;
 
-            // Выводим полученный код в нижнюю длинную клетку
-            document.getElementById('resultCode').value = finalCode;
+            document.getElementById('resultCode').value = generatedHeader;
+        }
+
+        function combineAndCopy() {
+            // Если заголовок еще не создавали, создаем его на лету из полей выше
+            if (!generatedHeader) {
+                generateConfig();
+            }
+
+            // Получаем ссылки из большой клетки
+            const vpnCodes = document.getElementById('userCodes').value;
+
+            // Склеиваем заголовок и сами коды
+            const finalFullText = generatedHeader + "\n\n" + vpnCodes;
+
+            // Функция копирования текста в буфер обмена
+            navigator.clipboard.writeText(finalFullText).then(() => {
+                // Показываем надпись "Скопировано" на 2 секунды
+                const status = document.getElementById('status');
+                status.style.display = 'block';
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 2000);
+            }).catch(err => {
+                alert('Ошибка при копировании: ', err);
+            });
         }
     </script>
 
