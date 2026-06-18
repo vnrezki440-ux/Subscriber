@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscriber Manager</title>
+    <title>Панель управления</title>
     <style>
         body {
             font-family: sans-serif;
@@ -16,54 +16,50 @@
             min-height: 100vh;
             color: #333;
         }
-        .menu-container {
+        .container {
             text-align: center;
             width: 100%;
-            max-width: 500px;
-            padding: 20px;
+            max-width: 600px;
+            padding: 30px;
             box-sizing: border-box;
             background: #fff;
             border: 2px solid #333;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         h1 {
-            font-size: 26px;
-            margin-bottom: 25px;
+            font-size: 24px;
+            margin-bottom: 15px;
             font-weight: bold;
         }
-        .sub-button {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 15px;
-            background-color: #ffffff;
-            color: #333333;
-            text-decoration: none;
+        .subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        /* Главная кнопка открытия */
+        .open-btn {
+            padding: 15px 30px;
             font-size: 16px;
             font-weight: bold;
-            border: 2px solid #333333;
+            background-color: #333;
+            color: #fff;
+            border: none;
             border-radius: 8px;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .sub-button:active {
-            background-color: #333333;
-            color: #ffffff;
+        .open-btn:active {
+            background-color: #555;
         }
-        
-        .block-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* Скрытый по умолчанию блок с клетками */
+        #generatorBlock {
+            display: none;
+            text-align: left;
+            margin-top: 25px;
             border-top: 1px dashed #ccc;
             padding-top: 20px;
         }
         .input-group {
-            text-align: left;
             margin-bottom: 15px;
         }
         .input-group label {
@@ -73,7 +69,8 @@
             margin-bottom: 5px;
             color: #444;
         }
-        .input-field {
+        /* Клетка для кода */
+        .input-short {
             width: 100%;
             padding: 10px;
             font-size: 14px;
@@ -82,142 +79,145 @@
             box-sizing: border-box;
             background-color: #fafafa;
         }
-        .create-btn, .action-btn {
+        /* Длинные клетки для текста */
+        .input-long {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+        }
+        .create-btn {
             width: 100%;
             padding: 14px;
-            background-color: #333;
+            background-color: #2ea44f;
             color: #fff;
             border: none;
             border-radius: 6px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
             text-transform: uppercase;
+            margin-top: 10px;
         }
-        .create-btn:active, .action-btn:active {
-            background-color: #555;
-        }
-        .action-btn {
-            background-color: #2ea44f; /* Зеленый цвет в стиле GitHub */
-        }
-        .action-btn:active {
+        .create-btn:active {
             background-color: #24823e;
         }
-        .result-box, .textarea-field {
-            width: 100%;
-            height: 130px;
-            margin-top: 15px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            border: 2px solid #333;
-            border-radius: 6px;
-            box-sizing: border-box;
-            resize: none;
+
+        /* --- СТИЛИ ДЛЯ ВАШЕЙ ФИНАЛЬНОЙ ПАНЕЛИ ПОДПИСКИ --- */
+        #finalPanel {
+            display: none;
             text-align: left;
         }
-        .result-box {
-            background-color: #222;
-            color: #fff;
-        }
-        .textarea-field {
-            background-color: #fff;
-            color: #333;
-            height: 150px;
-        }
-        .status-msg {
-            color: #2ea44f;
+        .info-row {
+            margin-bottom: 5px;
             font-size: 14px;
-            margin-top: 8px;
-            display: none;
+        }
+        .info-label {
+            font-weight: normal;
+            color: #555;
+        }
+        .links-title {
             font-weight: bold;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .links-list {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 0;
+        }
+        .link-item {
+            margin-bottom: 12px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
 
-    <div class="menu-container">
-        <h1>Subscriber</h1>
-        
-        <a href="https://gist.github.com" class="sub-button">Github Subscription</a>
-        <a href="https://pastee.dev" class="sub-button">Pasta Subscription</a>
-        
-        <div class="block-title">Block for Subscription</div>
-        
-        <div class="input-group">
-            <label>Subscription Name:</label>
-            <input type="text" id="subName" class="input-field" placeholder="Например: AsensioVPNS">
-        </div>
-        
-        <div class="input-group">
-            <label>Write Your Limit:</label>
-            <input type="text" id="subLimit" class="input-field" placeholder="Например: 50GB или 0">
-        </div>
-        
-        <div class="input-group">
-            <label>Write Your Web Site and support site:</label>
-            <input type="text" id="webAndSupport" class="input-field" placeholder="Например: https://max.ru">
+    <div class="container" id="mainContainer">
+        <div id="startScreen">
+            <h1>Панель управления</h1>
+            <div class="subtitle">Нажмите на "Создать мой панель"</div>
+            <button class="open-btn" onclick="showGenerator()">Создать мой панель</button>
         </div>
 
-        <button class="create-btn" onclick="generateConfig()">Create</button>
-        <textarea id="resultCode" class="result-box" readonly placeholder="Здесь появится сгенерированный заголовок..."></textarea>
+        <div id="generatorBlock">
+            <div class="input-group">
+                <label>Отправите ваш код</label>
+                <input type="text" id="vpnCode" class="input-short" placeholder="Вставьте сюда ваш VPN код...">
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите ваш имя пользователя</label>
+                <input type="text" id="userName" class="input-long" placeholder="Введите имя пользователя...">
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите название для подписки</label>
+                <input type="text" id="subTitle" class="input-long" placeholder="Например: User Information">
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите время окончании для подписок</label>
+                <input type="text" id="expDate" class="input-long" placeholder="Например: 15 Gun или Дату и время">
+            </div>
 
-        <div class="block-title">Submit Your Code:</div>
-        
-        <div class="input-group">
-            <label>Вставь сюда свои VPN ссылки (каждую с новой строки):</label>
-            <textarea id="userCodes" class="textarea-field" placeholder="trojan://...&#10;vless://...&#10;hysteria2://..."></textarea>
+            <button class="create-btn" onclick="buildFinalPanel()">Создать</button>
         </div>
 
-        <button class="action-btn" onclick="createSubscription()">Создать Подписку</button>
-        <div id="status" class="status-msg">Код скопирован! Перенаправляем на GitHub Gist... 🚀</div>
+        <div id="finalPanel">
+            <h1 id="displayTitle">User Information</h1>
+            
+            <div class="info-row"><span class="info-label">Username:</span> <span id="displayUser"></span></div>
+            
+            <div class="info-row"><span class="info-label">Status:</span> active</div>
+            <div class="info-row"><span class="info-label">Data Limit:</span> ∞</div>
+            <div class="info-row"><span class="info-label">Data Used:</span> 0B</div>
+            
+            <div class="info-row"><span class="info-label">Expiration Date:</span> <span id="displayDate"></span></div>
+
+            <div class="links-title">Links:</div>
+            
+            <ul class="links-list">
+                <li class="link-item" id="displayCode"></li>
+            </ul>
+        </div>
     </div>
 
     <script>
-        let generatedHeader = "";
-
-        function generateConfig() {
-            const name = document.getElementById('subName').value || 'AsensioVPNS';
-            const limitValue = document.getElementById('subLimit').value || '0';
-            const siteUrl = document.getElementById('webAndSupport').value || 'https://max.ru';
-
-            generatedHeader = 
-`# profile-title: ${name}
-#!name=${name}
-# profile-update-interval: 1
-# profile-web-page-url: ${siteUrl}
-# support-url: ${siteUrl}
-# subscription-userinfo: upload=0; download=0; total=${limitValue}`;
-
-            document.getElementById('resultCode').value = generatedHeader;
+        // Функция открытия генератора
+        function showGenerator() {
+            document.getElementById('generatorBlock').style.display = 'block';
         }
 
-        function createSubscription() {
-            // Если заголовок не был создан по кнопке Create, создаем его автоматически
-            if (!generatedHeader) {
-                generateConfig();
-            }
+        // Функция сборки вашей персональной панели
+        function buildFinalPanel() {
+            // Считываем то, что ты написал в клетки
+            const code = document.getElementById('vpnCode').value || 'Тут будет ваш код';
+            const user = document.getElementById('userName').value || 'User';
+            const title = document.getElementById('subTitle').value || 'User Information';
+            const date = document.getElementById('expDate').value || '∞';
 
-            const vpnCodes = document.getElementById('userCodes').value;
-            const finalFullText = generatedHeader + "\n\n" + vpnCodes;
+            // Полностью прячем интерфейс создания
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('generatorBlock').style.display = 'none';
 
-            // Копируем текст в буфер обмена
-            navigator.clipboard.writeText(finalFullText).then(() => {
-                // Показываем статус на экране
-                const status = document.getElementById('status');
-                status.style.display = 'block';
+            // Переносим данные в итоговый шаблон
+            document.getElementById('displayTitle').innerText = title;
+            document.getElementById('displayUser').innerText = user;
+            document.getElementById('displayDate').innerText = date;
+            document.getElementById('displayCode').innerText = code;
 
-                // Через 1.5 секунды открываем GitHub Gist в новой вкладке
-                setTimeout(() => {
-                    status.style.display = 'none';
-                    window.open('https://gist.github.com', '_blank');
-                }, 1500);
-            }).catch(err => {
-                alert('Не удалось скопировать код автоматически: ', err);
-            });
+            // Отображаем готовую панель на экране
+            document.getElementById('finalPanel').style.display = 'block';
         }
     </script>
 
 </body>
-</html>
+                                      </html>
