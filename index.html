@@ -1,4 +1,295 @@
-        // Автоматическая загрузка панели или выдача чистого Base64 для Nekobox/Happ
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            box-sizing: border-box;
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 12px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .open-btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #generatorBlock {
+            display: none;
+            text-align: left;
+            margin-top: 25px;
+            border-top: 1px dashed #ccc;
+            padding-top: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        .input-large-box {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            font-size: 14px;
+            font-family: monospace;
+            border: 2px solid #333;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+            resize: vertical;
+        }
+        .input-long {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+        }
+        .create-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #2ea44f;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .link-output-block {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 2px dashed #333;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .link-text-label {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .url-display {
+            width: 100%;
+            padding: 10px;
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #fff;
+        }
+        .btn-open { background-color: #333; color: #fff; }
+        .btn-copy { background-color: #1a73e8; color: #fff; border-color: #1a73e8; }
+
+        #finalPanel {
+            display: none;
+            text-align: left;
+        }
+        .info-row { margin-bottom: 5px; font-size: 14px; }
+        .info-label { color: #555; }
+        .links-title { font-weight: bold; margin-top: 25px; font-size: 16px; }
+        .links-list { list-style-type: disc; padding-left: 20px; }
+        .link-item { margin-bottom: 12px; word-break: break-all; font-family: monospace; font-size: 12px; }
+
+        #blackScreen {
+            display: none;
+            background-color: #000;
+            color: #fff;
+            font-family: monospace;
+            font-size: 13px;
+            padding: 20px;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+            width: 100%;
+            min-height: 100vh;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="blackScreen"></div>
+
+    <div class="container" id="mainContainer">
+        <div id="startScreen">
+            <h1>Панель управления</h1>
+            <div class="subtitle">Нажмите на "Создать мой панель"</div>
+            <button class="open-btn" onclick="showGenerator()">Создать мой панель</button>
+        </div>
+
+        <div id="generatorBlock">
+            <div class="input-group">
+                <label>Отправите ваш код</label>
+                <textarea id="vpnCode" class="input-large-box" placeholder="Вставьте ваши VPN коды (каждый с новой строки)..."></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите ваш имя пользователя</label>
+                <input type="text" id="userName" class="input-long" placeholder="Имя пользователя...">
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите название для подписки</label>
+                <input type="text" id="subTitle" class="input-long" placeholder="Например: User Information">
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите время окончании для подписок</label>
+                <input type="text" id="expDate" class="input-long" placeholder="Например: 15 Gun">
+            </div>
+
+            <button class="create-btn" onclick="processCreation()">Создать</button>
+            
+            <div id="linkOutput" class="link-output-block">
+                <span class="link-text-label">Вот ваш ссылка:</span>
+                <div id="generatedUrl" class="url-display"></div>
+                <div class="btn-row">
+                    <button class="action-btn btn-open" onclick="openBlackScreen()">Открыть</button>
+                    <button class="action-btn btn-copy" onclick="copyUrlToClipboard()">Копировать Ссылку</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="finalPanel">
+            <h1 id="displayTitle">User Information</h1>
+            <div class="info-row"><span class="info-label">Username:</span> <span id="displayUser"></span></div>
+            <div class="info-row"><span class="info-label">Status:</span> active</div>
+            <div class="info-row"><span class="info-label">Data Limit:</span> ∞</div>
+            <div class="info-row"><span class="info-label">Data Used:</span> 0B</div>
+            <div class="info-row"><span class="info-label">Expiration Date:</span> <span id="displayDate"></span></div>
+
+            <div class="links-title">Links:</div>
+            <ul class="links-list" id="displayCodesList"></ul>
+        </div>
+    </div>
+
+    <script>
+        let rawConfigText = "";
+
+        function showGenerator() {
+            document.getElementById('generatorBlock').style.display = 'block';
+        }
+
+        function processCreation() {
+            const code = document.getElementById('vpnCode').value || '';
+            const user = document.getElementById('userName').value || 'User';
+            const title = document.getElementById('subTitle').value || 'User Information';
+            const date = document.getElementById('expDate').value || '∞';
+
+            rawConfigText = 
+`# profile-title: ${title}
+#!name=${title}
+# profile-update-interval: 1
+# subscription-userinfo: upload=0; download=0; total=0
+
+${code}`;
+
+            document.getElementById('displayTitle').innerText = title;
+            document.getElementById('displayUser').innerText = user;
+            document.getElementById('displayDate').innerText = date;
+            
+            const listContainer = document.getElementById('displayCodesList');
+            listContainer.innerHTML = "";
+            const lines = code.split('\n');
+            lines.forEach(line => {
+                if(line.trim() !== "") {
+                    const li = document.createElement('li');
+                    li.className = "link-item";
+                    li.innerText = line;
+                    listContainer.appendChild(li);
+                }
+            });
+
+            const currentUrl = window.location.href.split('?')[0];
+            const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify({title, user, date, code}))));
+            const finalGeneratedUrl = currentUrl + "?data=" + encodedData;
+
+            document.getElementById('generatedUrl').innerText = finalGeneratedUrl;
+            document.getElementById('linkOutput').style.display = 'block';
+        }
+
+        function openBlackScreen() {
+            const blackScreen = document.getElementById('blackScreen');
+            blackScreen.innerText = rawConfigText;
+            blackScreen.style.display = 'block';
+            
+            blackScreen.onclick = function() {
+                blackScreen.style.display = 'none';
+            }
+        }
+
+        function copyUrlToClipboard() {
+            const urlText = document.getElementById('generatedUrl').innerText;
+            navigator.clipboard.writeText(urlText).then(() => {
+                alert('Ссылка скопирована!');
+            });
+        }
+
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
@@ -6,7 +297,6 @@
                 try {
                     const decodedData = JSON.parse(decodeURIComponent(escape(atob(dataParam))));
                     
-                    // Формируем чистый текст подписки с метаданными
                     const subscriptionText = 
 `# profile-title: ${decodedData.title}
 #!name=${decodedData.title}
@@ -15,27 +305,27 @@
 
 ${decodedData.code}`;
 
-                    // ПРОВЕРКА: Если запрос идет от приложения (Nekobox, HappProxy, v2ray и т.д.)
+                    // Проверяем, кто зашел: человек или приложение
                     const userAgent = navigator.userAgent.toLowerCase();
                     const isVpnApp = userAgent.includes('nekobox') || 
                                      userAgent.includes('happ') || 
                                      userAgent.includes('v2ray') || 
                                      userAgent.includes('clash') ||
-                                     userAgent.includes('sing-box');
+                                     userAgent.includes('sing-box') ||
+                                     !userAgent.includes('mozilla'); // Роботы приложений часто не отправляют mozilla
 
                     if (isVpnApp) {
-                        // Если это приложение — кодируем ВЕСЬ текст подписки в Base64 и отдаем ТОЛЬКО его
                         const base64Output = btoa(unescape(encodeURIComponent(subscriptionText)));
                         document.body.innerHTML = base64Output;
                         document.body.style.backgroundColor = "#ffffff";
                         document.body.style.color = "#000000";
                         document.body.style.fontFamily = "monospace";
-                        document.body.style.padding = "0";
+                        document.body.style.padding = "10px";
                         document.body.style.margin = "0";
-                        return; // Останавливаем выполнение, чтобы HTML-панель не грузилась
+                        return;
                     }
 
-                    // Если открыл ЧЕЛОВЕК в браузере — показываем твою красивую панель (Фото 2)
+                    // Если открыл человек в браузере
                     document.getElementById('startScreen').style.display = 'none';
                     document.getElementById('generatorBlock').style.display = 'none';
                     
@@ -61,4 +351,7 @@ ${decodedData.code}`;
                 }
             }
         }
-        
+    </script>
+
+</body>
+</html>
