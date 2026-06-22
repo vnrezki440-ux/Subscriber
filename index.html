@@ -1,3 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            box-sizing: border-box;
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 12px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .open-btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #generatorBlock {
+            display: none;
+            text-align: left;
+            margin-top: 25px;
+            border-top: 1px dashed #ccc;
+            padding-top: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        /* ИСПРАВЛЕНО: Большая, просторная клетка для ввода VPN кодов */
+        .input-large-box {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            font-size: 14px;
+            font-family: monospace;
+            border: 2px solid #333;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+            resize: vertical;
+        }
+        .input-long {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+        }
+        .create-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #2ea44f;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        
+        /* Блок ссылки */
+        .link-output-block {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 2px dashed #333;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .link-text-label {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .url-display {
+            width: 100%;
+            padding: 10px;
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #fff;
+        }
+        .btn-open { background-color: #333; color: #fff; }
+        .btn-copy { background-color: #1a73e8; color: #fff; border-color: #1a73e8; }
+
+        /* Итоговая панель (как на фото 2) */
+        #finalPanel {
+            display: none;
+            text-align: left;
+        }
+        .info-row { margin-bottom: 5px; font-size: 14px; }
+        .info-label { color: #555; }
+        .links-title { font-weight: bold; margin-top: 25px; font-size: 16px; }
+        .links-list { list-style-type: disc; padding-left: 20px; }
+        .link-item { margin-bottom: 12px; word-break: break-all; font-family: monospace; font-size: 12px; }
+
+        /* Черный экран (как на фото 3) */
+        #blackScreen {
+            display: none;
+            background-color: #000;
+            color: #fff;
+            font-family: monospace;
+            font-size: 13px;
+            padding: 20px;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+            width: 100%;
+            min-height: 100vh;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="blackScreen"></div>
+
+    <div class="container" id="mainContainer">
+        <div id="startScreen">
+            <h1>Панель управления</h1>
+            <div class="subtitle">Нажмите на "Создать мой панель"</div>
+            <button class="open-btn" onclick="showGenerator()">Создать мой панель</button>
+        </div>
+
+        <div id="generatorBlock">
+            <div class="input-group">
+                <label>Отправите ваш код</label>
+                <textarea id="vpnCode" class="input-large-box" placeholder="Вставьте ваши VPN коды (каждый с новой строки)..."></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите ваш имя пользователя</label>
+                <input type="text" id="userName" class="input-long" placeholder="Имя пользователя...">
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите название для подписки</label>
+                <input type="text" id="subTitle" class="input-long" placeholder="Например: User Information">
+            </div>
+            
+            <div class="input-group">
+                <label>Отправите время окончании для подписок</label>
+                <input type="text" id="expDate" class="input-long" placeholder="Например: 15 Gun">
+            </div>
+
+            <button class="create-btn" onclick="processCreation()">Создать</button>
+            
+            <div id="linkOutput" class="link-output-block">
+                <span class="link-text-label">Вот ваш ссылка:</span>
+                <div id="generatedUrl" class="url-display"></div>
+                <div class="btn-row">
+                    <button class="action-btn btn-open" onclick="openBlackScreen()">Открыть</button>
+                    <button class="action-btn btn-copy" onclick="copyUrlToClipboard()">Копировать Ссылку</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="finalPanel">
+            <h1 id="displayTitle">User Information</h1>
+            <div class="info-row"><span class="info-label">Username:</span> <span id="displayUser"></span></div>
+            <div class="info-row"><span class="info-label">Status:</span> active</div>
+            <div class="info-row"><span class="info-label">Data Limit:</span> ∞</div>
+            <div class="info-row"><span class="info-label">Data Used:</span> 0B</div>
+            <div class="info-row"><span class="info-label">Expiration Date:</span> <span id="displayDate"></span></div>
+
+            <div class="links-title">Links:</div>
+            <ul class="links-list" id="displayCodesList"></ul>
+        </div>
+    </div>
+
     <script>
         let rawConfigText = "";
 
@@ -44,9 +279,7 @@ ${code}`;
             // Генерируем уникальную ссылку, кодируя данные в URL-адрес страницы
             const currentUrl = window.location.href.split('?')[0];
             const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify({title, user, date, code}))));
-            
-            // Твоя хитрость: сразу добавляем &app=true в копируемую ссылку, чтобы Nekobox гарантированно читал Base64!
-            const finalGeneratedUrl = currentUrl + "?data=" + encodedData + "&app=true";
+            const finalGeneratedUrl = currentUrl + "?data=" + encodedData;
 
             // Выводим ссылку на экран и показываем новые кнопки
             document.getElementById('generatedUrl').innerText = finalGeneratedUrl;
@@ -59,6 +292,7 @@ ${code}`;
             blackScreen.innerText = rawConfigText;
             blackScreen.style.display = 'block';
             
+            // Клик по черному экрану закроет его обратно
             blackScreen.onclick = function() {
                 blackScreen.style.display = 'none';
             }
@@ -72,7 +306,7 @@ ${code}`;
             });
         }
 
-        // твоя доработанная автоматическая загрузка панели или выдача чистого Base64
+        // Автоматическая загрузка панели, если перешли по сгенерированной ссылке
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
@@ -80,39 +314,6 @@ ${code}`;
                 try {
                     const decodedData = JSON.parse(decodeURIComponent(escape(atob(dataParam))));
                     
-                    // Формируем чистый текст подписки со всеми метаданными
-                    const subscriptionText = 
-`# profile-title: ${decodedData.title}
-#!name=${decodedData.title}
-# profile-update-interval: 1
-# profile-web-page-url: https://max.ru
-# support-url: https://max.ru
-# subscription-userinfo: upload=0; download=0; total=0
-
-${decodedData.code}`;
-
-                    // Генерируем чистый Base64 код для приложения
-                    const base64Output = btoa(unescape(encodeURIComponent(subscriptionText)));
-
-                    // Проверяем, кто делает запрос
-                    const userAgent = navigator.userAgent.toLowerCase();
-                    const isVpnApp = userAgent.includes('nekobox') || 
-                                     userAgent.includes('happ') || 
-                                     userAgent.includes('v2ray') || 
-                                     userAgent.includes('clash') ||
-                                     userAgent.includes('sing-box') ||
-                                     urlParams.get('app') === 'true'; // Твой козырь
-
-                    if (isVpnApp) {
-                        // Очищаем страницу и отдаем ТОЛЬКО чистый текст Base64, без HTML тегов
-                        document.open("text/plain");
-                        document.write(base64Output);
-                        document.close();
-                        return; // Останавливаем выполнение кода
-                    }
-
-                    // --- ОСТАЛЬНОЙ КОД ДЛЯ ЧЕЛОВЕКА (БРАУЗЕРА) ---
-                    // ИСПРАВЛЕНО: убран баг с двойным .style.style
                     document.getElementById('startScreen').style.display = 'none';
                     document.getElementById('generatorBlock').style.display = 'none';
                     
@@ -132,13 +333,13 @@ ${decodedData.code}`;
                         }
                     });
                     
-                    // Сохраняем текст для кнопки "Открыть" (черный экран) на случай, если человек перешел по ссылке
-                    rawConfigText = subscriptionText;
-                    
                     document.getElementById('finalPanel').style.display = 'block';
                 } catch(e) {
-                    console.error("Ошибка разбора ссылки подписки", e);
+                    console.error("Ошибка разбора ссылки подписки");
                 }
             }
         }
-                </script>
+    </script>
+
+</body>
+</html>
