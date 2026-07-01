@@ -35,7 +35,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative;
         }
-        /* ВЕРХНЯЯ ПАНЕЛЬ С КНОПКАМИ ЯЗЫКА И WIFI */
         .top-navbar {
             display: flex;
             justify-content: flex-end;
@@ -68,7 +67,6 @@
             padding-bottom: 5px;
         }
         
-        /* ФОРМА СОЗДАНИЯ */
         .input-group { margin-bottom: 12px; text-align: left; }
         .input-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; }
         .input-field {
@@ -83,7 +81,6 @@
         }
         .main-btn:active { background: #444; }
 
-        /* КАРТОЧКА ПОДПИСКИ В СПИСКЕ */
         .sub-card {
             background: #fff; border: 2px solid #222; border-radius: 10px;
             padding: 15px; margin-bottom: 15px; text-align: left; position: relative;
@@ -96,7 +93,6 @@
         
         .progress-container { margin-bottom: 12px; }
         .progress-bar-text { display: flex; justify-content: center; font-size: 12px; font-family: monospace; margin-bottom: 2px; }
-        .progress-line { height: 4px; background: #222; width: 100%; border-radius: 2px; }
         
         .card-open-btn {
             width: 100%; padding: 8px; background: #fff; border: 2px solid #222;
@@ -104,7 +100,6 @@
         }
         .card-open-btn:hover { background: #222; color: #fff; }
 
-        /* МОДАЛЬНЫЕ ОКНА (ОКНА ИЗМЕНЕНИЙ И ПИНГА) */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box;
@@ -117,8 +112,10 @@
         .modal-window h2 { font-size: 18px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
         
         .edit-input-row { display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
-        .edit-input-row .input-field { background: #eee; pointer-events: none; }
-        .edit-input-row .input-field.editable { background: #fff; pointer-events: auto; border-color: var(--accent-color); }
+        
+        /* ИСПРАВЛЕНО: Стили для заблокированных и разблокированных полей карандаша */
+        .edit-input-row .input-field { background: #eee; color: #555; border-color: #ccc; }
+        .edit-input-row .input-field.editable { background: #fff !important; color: #000 !important; border-color: var(--accent-color) !important; }
         
         .param-box { border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
         .param-btn {
@@ -133,11 +130,10 @@
         .btn-save { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
         .btn-cancel { background: #fff; }
 
-        /* ОКНО ПИНГА */
         .ping-list { font-family: monospace; font-size: 13px; line-height: 1.6; margin-top: 10px; }
-        .ping-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 4px 0; }
+        .ping-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 4px 0; cursor: pointer; }
+        .ping-item:hover { background: #f0f0f0; }
         
-        /* ЭКРАН КЛИЕНТА (USER INFORMATION) И ЧЕРНЫЙ ЭКРАН */
         #clientScreen, #blackScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
         #clientScreen { background: #fff; padding: 30px; text-align: left; color: #333; }
         #blackScreen { background: #000; color: #fff; font-family: monospace; padding: 20px; white-space: pre-wrap; word-break: break-all; }
@@ -152,9 +148,9 @@
 </head>
 <body>
 
-    <!-- ГЛАВНАЯ СТРАНИЦА ПАНЕЛИ -->
+    <div id="blackScreen" onclick="closeBlackScreen()"></div>
+
     <div class="panel-container" id="panelMain">
-        <!-- ВЕРХНЯЯ НАВИГАЦИЯ -->
         <div class="top-navbar">
             <button class="nav-icon-btn" onclick="toggleLanguage()" id="langBtn">🌐 Русский</button>
             <button class="nav-icon-btn" onclick="openPingModal()">📶 Wifi</button>
@@ -162,7 +158,6 @@
 
         <h1 id="panelTitle">Панель управления</h1>
         
-        <!-- ФОРМА ДЛЯ ДОБАВЛЕНИЯ НОВОЙ ПОДПИСКИ -->
         <div class="input-group">
             <label id="lblAddUser">Отправите ваш имя пользователя:</label>
             <input type="text" id="newUsername" class="input-field" placeholder="User123">
@@ -181,27 +176,23 @@
         </div>
         <button class="main-btn" onclick="addNewSubscription()" id="btnCreate">Создать</button>
 
-        <!-- РАЗДЕЛ "МОИ ПОДПИСКИ" -->
         <div class="section-title" id="lblMySubs">Мои Подписки:</div>
-        <div id="subscriptionsContainer">
-            <!-- Сюда скрипт будет добавлять карточки клиентов -->
-        </div>
+        <div id="subscriptionsContainer"></div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ИЗМЕНЕНИЯ ПОДПИСКИ -->
     <div class="modal-overlay" id="editModal">
         <div class="modal-window">
             <h2 id="modalEditTitle">Изменение подписки</h2>
             
             <label style="font-size:12px; font-weight:bold;" id="lblEditUser">Имя Пользователя:</label>
             <div class="edit-input-row">
-                <input type="text" id="editUserField" class="input-field">
+                <input type="text" id="editUserField" class="input-field" readonly>
                 <button class="icon-btn" onclick="enableEdit('editUserField')">✏️</button>
             </div>
 
             <label style="font-size:12px; font-weight:bold;" id="lblEditDate">Время окончании:</label>
             <div class="edit-input-row">
-                <input type="text" id="editDateField" class="input-field">
+                <input type="text" id="editDateField" class="input-field" readonly>
                 <button class="icon-btn" onclick="enableEdit('editDateField')">✏️</button>
             </div>
 
@@ -209,12 +200,12 @@
             <div style="margin-left: 10px; margin-top: 5px;">
                 <label style="font-size:11px;" id="lblEditWeb">Веб-сайт:</label>
                 <div class="edit-input-row">
-                    <input type="text" id="editWebField" class="input-field">
+                    <input type="text" id="editWebField" class="input-field" readonly>
                     <button class="icon-btn" onclick="enableEdit('editWebField')">✏️</button>
                 </div>
                 <label style="font-size:11px;" id="lblEditSupport">Сайт о помощи:</label>
                 <div class="edit-input-row">
-                    <input type="text" id="editSupportField" class="input-field">
+                    <input type="text" id="editSupportField" class="input-field" readonly>
                     <button class="icon-btn" onclick="enableEdit('editSupportField')">✏️</button>
                 </div>
             </div>
@@ -234,21 +225,17 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО WIFI (ПИНГ ДОМЕНОВ) -->
     <div class="modal-overlay" id="pingModal">
         <div class="modal-window" style="max-width: 400px; text-align: center;">
             <h2>📶 Wifi</h2>
             <button class="main-btn" style="margin-bottom: 15px;" onclick="runPingCheck()" id="btnCheckPing">Проверить Пинг</button>
-            <div class="ping-list" id="pingListResults" style="text-align: left;">
-                <!-- Тут выводятся результаты пинга -->
-            </div>
+            <div class="ping-list" id="pingListResults" style="text-align: left;"></div>
             <div class="modal-footer" style="justify-content: center; margin-top: 20px;">
                 <button class="footer-btn btn-cancel" onclick="closePingModal()">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- ЭКРАН ПОЛЬЗОВАТЕЛЯ (КАК НА ВТОРОМ СКРИНШОТЕ) -->
     <div id="clientScreen">
         <h1 class="client-title" id="cliPanelTitle">User Information</h1>
         <div class="client-row"><span class="client-label">Username:</span> <span id="cliUsername"></span></div>
@@ -261,17 +248,12 @@
         <button class="close-screen-btn" onclick="closeClientScreen()">⬅ Back to Admin Panel</button>
     </div>
 
-    <!-- СЫРОЙ ЧЕРНЫЙ ЭКРАН (КАК НА ТРЕТЬЕМ СКРИНШОТЕ) -->
-    <div id="blackScreen" onclick="closeBlackScreen()"></div>
-
-    <!-- ЛОГИКА НА JAVASCRIPT -->
     <script>
-        // Инициализация базы данных в памяти браузера
         let subscriptions = JSON.parse(localStorage.getItem('vpn_subs')) || [];
         let currentEditId = null;
-        let currentLanguage = 'ru'; // ru, en, tk
+        let currentLanguage = 'ru'; 
+        let selectedDomain = 'github.io'; // Дефолтный рабочий домен
 
-        // Текстовые переводы для мультиязычности
         const translations = {
             ru: {
                 title: "Панель управления", mySubs: "Мои Подписки:", create: "Создать",
@@ -302,13 +284,11 @@
             }
         };
 
-        // Сохранение данных
         function saveToStorage() {
             localStorage.setItem('vpn_subs', JSON.stringify(subscriptions));
             renderSubscriptions();
         }
 
-        // Рендеринг карточек клиентов
         function renderSubscriptions() {
             const container = document.getElementById('subscriptionsContainer');
             container.innerHTML = "";
@@ -332,8 +312,7 @@
                     </div>
                     <div class="progress-container">
                         <div class="progress-bar-text">_______________________________</div>
-                        <div class="progress-bar-text">${sub.usedData}/${sub.isReset ? '∞ (Сброшено)' : '∞'}</div>
-                        <div class="progress-line"></div>
+                        <div class="progress-bar-text">${sub.usedData}/${sub.isReset ? '0B / ∞' : '∞'}</div>
                     </div>
                     <button class="card-open-btn" onclick="openClientScreen('${sub.id}')">Открыть</button>
                 `;
@@ -341,7 +320,6 @@
             });
         }
 
-        // Добавление новой подписки
         function addNewSubscription() {
             const username = document.getElementById('newUsername').value.trim();
             const title = document.getElementById('newTitle').value.trim() || 'User Information';
@@ -369,21 +347,39 @@
             subscriptions.push(newSub);
             saveToStorage();
 
-            // Очистка формы
             document.getElementById('newUsername').value = "";
             document.getElementById('newCode').value = "";
         }
 
-        // Копирование уникальной интернет-ссылки подписки
         function copySubscriptionLink(id) {
             const sub = subscriptions.find(s => s.id === id);
             if(!sub) return;
             const currentUrl = window.location.href.split('?')[0];
+            const baseUrl = currentUrl.replace('github.io', selectedDomain); // Меняем домен на выбранный в Wifi
             const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(sub))));
-            const finalUrl = `${currentUrl}?subData=${encoded}`;
+            const finalUrl = `${baseUrl}?subData=${encoded}`;
             
             navigator.clipboard.writeText(finalUrl).then(() => {
-                alert(`Ссылка для ${sub.username} успешно скопирована!`);
+                alert(`Ссылка на домене ${selectedDomain} скопирована!`);
             });
         }
-    
+
+        function openEditModal(id) {
+            currentEditId = id;
+            const sub = subscriptions.find(s => s.id === id);
+            if(!sub) return;
+
+            // Сбрасываем активность полей (делаем их серыми)
+            const fields = ['editUserField', 'editDateField', 'editWebField', 'editSupportField'];
+            fields.forEach(fId => {
+                const f = document.getElementById(fId);
+                f.readOnly = true;
+                f.classList.remove('editable');
+            });
+
+            document.getElementById('editUserField').value = sub.username;
+            document.getElementById('editDateField').value = sub.date;
+            document.getElementById('editWebField').value = sub.webSite;
+            document.getElementById('editSupportField').value = sub.supportSite;
+
+            const blockBtn = document.getElementById('bt
