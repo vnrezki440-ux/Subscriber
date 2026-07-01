@@ -3,343 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель управления</title>
+    <title>VPN Admin Panel</title>
     <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #cccccc;
+            --accent-color: #2ea44f;
+            --danger-color: #cb2431;
+        }
         body {
-            font-family: sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            color: #333;
         }
-        .container {
-            text-align: center;
+        .panel-container {
             width: 100%;
-            max-width: 600px;
-            padding: 30px;
+            max-width: 550px;
+            background: var(--card-bg);
+            border: 2px solid #222;
+            border-radius: 14px;
+            padding: 20px;
             box-sizing: border-box;
-            background: #fff;
-            border: 2px solid #333;
-            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            font-weight: bold;
+        /* ВЕРХНЯЯ ПАНЕЛЬ С КНОПКАМИ ЯЗЫКА И WIFI */
+        .top-navbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            border-bottom: 2px solid #222;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-        .subtitle {
-            font-size: 16px;
-            color: #555;
-            margin-bottom: 25px;
-        }
-        .open-btn {
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #333;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        #generatorBlock {
-            display: none;
-            text-align: left;
-            margin-top: 25px;
-            border-top: 1px dashed #ccc;
-            padding-top: 20px;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #444;
-        }
-        /* ИСПРАВЛЕНО: Большая, просторная клетка для ввода VPN кодов */
-        .input-large-box {
-            width: 100%;
-            height: 150px;
-            padding: 12px;
-            font-size: 14px;
-            font-family: monospace;
-            border: 2px solid #333;
+        .nav-icon-btn {
+            background: none;
+            border: 1px solid #222;
             border-radius: 6px;
-            box-sizing: border-box;
-            background-color: #fafafa;
-            resize: vertical;
-        }
-        .input-long {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            border: 2px solid #333;
-            border-radius: 6px;
-            box-sizing: border-box;
-            background-color: #fafafa;
-        }
-        .create-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: #2ea44f;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 6px 10px;
             font-weight: bold;
             cursor: pointer;
-            text-transform: uppercase;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nav-icon-btn:hover { background: #eee; }
+
+        h1 { font-size: 22px; text-align: center; margin: 10px 0 20px 0; text-transform: uppercase; }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
         }
         
-        /* Блок ссылки */
-        .link-output-block {
-            display: none;
-            margin-top: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border: 2px dashed #333;
-            border-radius: 8px;
-            text-align: left;
+        /* ФОРМА СОЗДАНИЯ */
+        .input-group { margin-bottom: 12px; text-align: left; }
+        .input-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+        .input-field {
+            width: 100%; padding: 10px; font-size: 14px; border: 2px solid #222;
+            border-radius: 6px; box-sizing: border-box; background: #fafafa;
         }
-        .link-text-label {
-            font-weight: bold;
-            font-size: 15px;
-            margin-bottom: 8px;
-            display: block;
+        .textarea-field { height: 80px; resize: vertical; font-family: monospace; }
+        .main-btn {
+            width: 100%; padding: 12px; background: #222; color: #fff;
+            border: none; border-radius: 6px; font-size: 15px; font-weight: bold;
+            cursor: pointer; text-transform: uppercase; margin-top: 5px;
         }
-        .url-display {
-            width: 100%;
-            padding: 10px;
-            background: #eee;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            box-sizing: border-box;
-            margin-bottom: 15px;
-            word-break: break-all;
-        }
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: bold;
-            border: 2px solid #333;
-            border-radius: 6px;
-            cursor: pointer;
-            background: #fff;
-        }
-        .btn-open { background-color: #333; color: #fff; }
-        .btn-copy { background-color: #1a73e8; color: #fff; border-color: #1a73e8; }
+        .main-btn:active { background: #444; }
 
-        /* Итоговая панель (как на фото 2) */
-        #finalPanel {
-            display: none;
-            text-align: left;
+        /* КАРТОЧКА ПОДПИСКИ В СПИСКЕ */
+        .sub-card {
+            background: #fff; border: 2px solid #222; border-radius: 10px;
+            padding: 15px; margin-bottom: 15px; text-align: left; position: relative;
         }
-        .info-row { margin-bottom: 5px; font-size: 14px; }
-        .info-label { color: #555; }
-        .links-title { font-weight: bold; margin-top: 25px; font-size: 16px; }
-        .links-list { list-style-type: disc; padding-left: 20px; }
-        .link-item { margin-bottom: 12px; word-break: break-all; font-family: monospace; font-size: 12px; }
+        .sub-card.blocked { background: #ffeef0; border-color: var(--danger-color); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .card-username { font-weight: bold; font-size: 16px; word-break: break-all; }
+        .card-actions { display: flex; gap: 12px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 2px; }
+        
+        .progress-container { margin-bottom: 12px; }
+        .progress-bar-text { display: flex; justify-content: center; font-size: 12px; font-family: monospace; margin-bottom: 2px; }
+        .progress-line { height: 4px; background: #222; width: 100%; border-radius: 2px; }
+        
+        .card-open-btn {
+            width: 100%; padding: 8px; background: #fff; border: 2px solid #222;
+            border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center;
+        }
+        .card-open-btn:hover { background: #222; color: #fff; }
 
-        /* Черный экран (как на фото 3) */
-        #blackScreen {
-            display: none;
-            background-color: #000;
-            color: #fff;
-            font-family: monospace;
-            font-size: 13px;
-            padding: 20px;
-            text-align: left;
-            white-space: pre-wrap;
-            word-break: break-all;
-            width: 100%;
-            min-height: 100vh;
-            box-sizing: border-box;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 9999;
-            overflow-y: auto;
+        /* МОДАЛЬНЫЕ ОКНА (ОКНА ИЗМЕНЕНИЙ И ПИНГА) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box;
         }
+        .modal-window {
+            background: #fff; border: 2px solid #222; border-radius: 12px;
+            padding: 20px; width: 100%; max-width: 450px; box-sizing: border-box;
+            max-height: 90vh; overflow-y: auto; text-align: left;
+        }
+        .modal-window h2 { font-size: 18px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        
+        .edit-input-row { display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
+        .edit-input-row .input-field { background: #eee; pointer-events: none; }
+        .edit-input-row .input-field.editable { background: #fff; pointer-events: auto; border-color: var(--accent-color); }
+        
+        .param-box { border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
+        .param-btn {
+            width: 100%; padding: 8px; margin-bottom: 8px; background: #fff;
+            border: 1px solid #222; border-radius: 4px; cursor: pointer; font-weight: bold; text-align: left;
+        }
+        .param-btn:last-child { margin-bottom: 0; }
+        .param-btn.danger { color: var(--danger-color); border-color: var(--danger-color); }
+        
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+        .footer-btn { padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #222; }
+        .btn-save { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .btn-cancel { background: #fff; }
+
+        /* ОКНО ПИНГА */
+        .ping-list { font-family: monospace; font-size: 13px; line-height: 1.6; margin-top: 10px; }
+        .ping-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 4px 0; }
+        
+        /* ЭКРАН КЛИЕНТА (USER INFORMATION) И ЧЕРНЫЙ ЭКРАН */
+        #clientScreen, #blackScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
+        #clientScreen { background: #fff; padding: 30px; text-align: left; color: #333; }
+        #blackScreen { background: #000; color: #fff; font-family: monospace; padding: 20px; white-space: pre-wrap; word-break: break-all; }
+        .client-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .client-row { font-size: 15px; margin-bottom: 6px; }
+        .client-label { color: #555; }
+        .client-links-title { font-weight: bold; margin-top: 25px; font-size: 16px; }
+        .client-list { list-style-type: disc; padding-left: 20px; }
+        .client-item { margin-bottom: 10px; word-break: break-all; font-family: monospace; font-size: 13px; }
+        .close-screen-btn { margin-top: 30px; padding: 10px 20px; font-weight: bold; cursor: pointer; background: #222; color: #fff; border: none; border-radius: 6px; }
     </style>
 </head>
 <body>
 
-    <div id="blackScreen"></div>
-
-    <div class="container" id="mainContainer">
-        <div id="startScreen">
-            <h1>Панель управления</h1>
-            <div class="subtitle">Нажмите на "Создать мой панель"</div>
-            <button class="open-btn" onclick="showGenerator()">Создать мой панель</button>
+    <!-- ГЛАВНАЯ СТРАНИЦА ПАНЕЛИ -->
+    <div class="panel-container" id="panelMain">
+        <!-- ВЕРХНЯЯ НАВИГАЦИЯ -->
+        <div class="top-navbar">
+            <button class="nav-icon-btn" onclick="toggleLanguage()" id="langBtn">🌐 Русский</button>
+            <button class="nav-icon-btn" onclick="openPingModal()">📶 Wifi</button>
         </div>
 
-        <div id="generatorBlock">
-            <div class="input-group">
-                <label>Отправите ваш код</label>
-                <textarea id="vpnCode" class="input-large-box" placeholder="Вставьте ваши VPN коды (каждый с новой строки)..."></textarea>
-            </div>
-            
-            <div class="input-group">
-                <label>Отправите ваш имя пользователя</label>
-                <input type="text" id="userName" class="input-long" placeholder="Имя пользователя...">
-            </div>
-            
-            <div class="input-group">
-                <label>Отправите название для подписки</label>
-                <input type="text" id="subTitle" class="input-long" placeholder="Например: User Information">
-            </div>
-            
-            <div class="input-group">
-                <label>Отправите время окончании для подписок</label>
-                <input type="text" id="expDate" class="input-long" placeholder="Например: 15 Gun">
-            </div>
-
-            <button class="create-btn" onclick="processCreation()">Создать</button>
-            
-            <div id="linkOutput" class="link-output-block">
-                <span class="link-text-label">Вот ваш ссылка:</span>
-                <div id="generatedUrl" class="url-display"></div>
-                <div class="btn-row">
-                    <button class="action-btn btn-open" onclick="openBlackScreen()">Открыть</button>
-                    <button class="action-btn btn-copy" onclick="copyUrlToClipboard()">Копировать Ссылку</button>
-                </div>
-            </div>
+        <h1 id="panelTitle">Панель управления</h1>
+        
+        <!-- ФОРМА ДЛЯ ДОБАВЛЕНИЯ НОВОЙ ПОДПИСКИ -->
+        <div class="input-group">
+            <label id="lblAddUser">Отправите ваш имя пользователя:</label>
+            <input type="text" id="newUsername" class="input-field" placeholder="User123">
         </div>
+        <div class="input-group">
+            <label id="lblAddTitle">Отправите название для подписки:</label>
+            <input type="text" id="newTitle" class="input-field" placeholder="User Information">
+        </div>
+        <div class="input-group">
+            <label id="lblAddDate">Отправите время окончании для подписок:</label>
+            <input type="text" id="newDate" class="input-field" placeholder="01.01.2033">
+        </div>
+        <div class="input-group">
+            <label id="lblAddCode">Отправите ваш код (VPN ссылки):</label>
+            <textarea id="newCode" class="input-field textarea-field" placeholder="vless://...&#10;trojan://..."></textarea>
+        </div>
+        <button class="main-btn" onclick="addNewSubscription()" id="btnCreate">Создать</button>
 
-        <div id="finalPanel">
-            <h1 id="displayTitle">User Information</h1>
-            <div class="info-row"><span class="info-label">Username:</span> <span id="displayUser"></span></div>
-            <div class="info-row"><span class="info-label">Status:</span> active</div>
-            <div class="info-row"><span class="info-label">Data Limit:</span> ∞</div>
-            <div class="info-row"><span class="info-label">Data Used:</span> 0B</div>
-            <div class="info-row"><span class="info-label">Expiration Date:</span> <span id="displayDate"></span></div>
-
-            <div class="links-title">Links:</div>
-            <ul class="links-list" id="displayCodesList"></ul>
+        <!-- РАЗДЕЛ "МОИ ПОДПИСКИ" -->
+        <div class="section-title" id="lblMySubs">Мои Подписки:</div>
+        <div id="subscriptionsContainer">
+            <!-- Сюда скрипт будет добавлять карточки клиентов -->
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ИЗМЕНЕНИЯ ПОДПИСКИ -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-window">
+            <h2 id="modalEditTitle">Изменение подписки</h2>
+            
+            <label style="font-size:12px; font-weight:bold;" id="lblEditUser">Имя Пользователя:</label>
+            <div class="edit-input-row">
+                <input type="text" id="editUserField" class="input-field">
+                <button class="icon-btn" onclick="enableEdit('editUserField')">✏️</button>
+            </div>
+
+            <label style="font-size:12px; font-weight:bold;" id="lblEditDate">Время окончании:</label>
+            <div class="edit-input-row">
+                <input type="text" id="editDateField" class="input-field">
+                <button class="icon-btn" onclick="enableEdit('editDateField')">✏️</button>
+            </div>
+
+            <span style="font-size:12px; font-weight:bold;" id="lblEditSites">Веб-сайт и Сайт о помощи:</span>
+            <div style="margin-left: 10px; margin-top: 5px;">
+                <label style="font-size:11px;" id="lblEditWeb">Веб-сайт:</label>
+                <div class="edit-input-row">
+                    <input type="text" id="editWebField" class="input-field">
+                    <button class="icon-btn" onclick="enableEdit('editWebField')">✏️</button>
+                </div>
+                <label style="font-size:11px;" id="lblEditSupport">Сайт о помощи:</label>
+                <div class="edit-input-row">
+                    <input type="text" id="editSupportField" class="input-field">
+                    <button class="icon-btn" onclick="enableEdit('editSupportField')">✏️</button>
+                </div>
+            </div>
+
+            <div class="param-box">
+                <span style="font-size:12px; font-weight:bold; display:block; margin-bottom:8px;" id="lblParamsTitle">Параметры:</span>
+                <button class="param-btn" onclick="modalToggleBlock()" id="btnParamBlock">Заблокировать Подписку</button>
+                <button class="param-btn" onclick="modalResetData()" id="btnParamReset">Сбросить Подписку</button>
+                <button class="param-btn" onclick="modalChangeDomain()" id="btnParamDomain">Изменить Домен</button>
+                <button class="param-btn danger" onclick="modalDeleteSub()" id="btnParamDelete">Удалить Подписку</button>
+            </div>
+
+            <div class="modal-footer">
+                <button class="footer-btn btn-cancel" onclick="closeEditModal()" id="btnCancel">Отмена</button>
+                <button class="footer-btn btn-save" onclick="saveSubscriptionChanges()" id="btnSave">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО WIFI (ПИНГ ДОМЕНОВ) -->
+    <div class="modal-overlay" id="pingModal">
+        <div class="modal-window" style="max-width: 400px; text-align: center;">
+            <h2>📶 Wifi</h2>
+            <button class="main-btn" style="margin-bottom: 15px;" onclick="runPingCheck()" id="btnCheckPing">Проверить Пинг</button>
+            <div class="ping-list" id="pingListResults" style="text-align: left;">
+                <!-- Тут выводятся результаты пинга -->
+            </div>
+            <div class="modal-footer" style="justify-content: center; margin-top: 20px;">
+                <button class="footer-btn btn-cancel" onclick="closePingModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН ПОЛЬЗОВАТЕЛЯ (КАК НА ВТОРОМ СКРИНШОТЕ) -->
+    <div id="clientScreen">
+        <h1 class="client-title" id="cliPanelTitle">User Information</h1>
+        <div class="client-row"><span class="client-label">Username:</span> <span id="cliUsername"></span></div>
+        <div class="client-row"><span class="client-label">Status:</span> <span id="cliStatus">active</span></div>
+        <div class="client-row"><span class="client-label">Data Limit:</span> <span id="cliLimit">∞</span></div>
+        <div class="client-row"><span class="client-label">Data Used:</span> <span id="cliUsed">0B</span></div>
+        <div class="client-row"><span class="client-label">Expiration Date:</span> <span id="cliDate"></span></div>
+        <div class="client-links-title">Links:</div>
+        <ul class="client-list" id="cliLinksList"></ul>
+        <button class="close-screen-btn" onclick="closeClientScreen()">⬅ Back to Admin Panel</button>
+    </div>
+
+    <!-- СЫРОЙ ЧЕРНЫЙ ЭКРАН (КАК НА ТРЕТЬЕМ СКРИНШОТЕ) -->
+    <div id="blackScreen" onclick="closeBlackScreen()"></div>
+
+    <!-- ЛОГИКА НА JAVASCRIPT -->
     <script>
-        let rawConfigText = "";
+        // Инициализация базы данных в памяти браузера
+        let subscriptions = JSON.parse(localStorage.getItem('vpn_subs')) || [];
+        let currentEditId = null;
+        let currentLanguage = 'ru'; // ru, en, tk
 
-        function showGenerator() {
-            document.getElementById('generatorBlock').style.display = 'block';
+        // Текстовые переводы для мультиязычности
+        const translations = {
+            ru: {
+                title: "Панель управления", mySubs: "Мои Подписки:", create: "Создать",
+                addUsr: "Отправите ваш имя пользователя:", addTitle: "Отправите название для подписки:",
+                addDate: "Отправите время окончании для подписок:", addCode: "Отправите ваш код (VPN ссылки):",
+                editTitle: "Изменение подписки", editUsr: "Имя Пользователя:", editDate: "Время окончании:",
+                editSites: "Веб-сайт и Сайт о помощи:", paramTitle: "Параметры:", btnBlock: "Заблокировать Подписку",
+                btnUnblock: "Разблокировать Подписку", btnReset: "Сбросить Подписку", btnDomain: "Изменить Домен",
+                btnDelete: "Удалить Подписку", btnCancel: "Отмена", btnSave: "Сохранить", checkPing: "Проверить Пинг"
+            },
+            en: {
+                title: "Admin Panel", mySubs: "My Subscriptions:", create: "Create",
+                addUsr: "Send your username:", addTitle: "Send subscription title:",
+                addDate: "Send subscription expiration time:", addCode: "Send your code (VPN links):",
+                editTitle: "Edit Subscription", editUsr: "Username:", editDate: "Expiration Time:",
+                editSites: "Web Site & Support Site:", paramTitle: "Parameters:", btnBlock: "Block Subscription",
+                btnUnblock: "Unblock Subscription", btnReset: "Reset Data Usage", btnDomain: "Change Domain",
+                btnDelete: "Delete Subscription", btnCancel: "Cancel", btnSave: "Save", checkPing: "Check Ping"
+            },
+            tk: {
+                title: "Dolandyryş paneli", mySubs: "Meniň abunalyklarym:", create: "Döretmek",
+                addUsr: "Ulanyjy adyňyzy iberiň:", addTitle: "Abunalygyň adyny iberiň:",
+                addDate: "Abunalygyň gutarýan wagtyny iberiň:", addCode: "Koduňyzy iberiň (VPN baglanyşyklary):",
+                editTitle: "Abunalygy üýtgetmek", editUsr: "Ulanyjy ady:", editDate: "Gutarýan wagty:",
+                editSites: "Web-saýt we goldaw saýty:", paramTitle: "Parametrler:", btnBlock: "Abunalygy bökdemek",
+                btnUnblock: "Abunalygy açmak", btnReset: "Maglumaty nol wezipä getirmek", btnDomain: "Domany üýtgetmek",
+                btnDelete: "Abunalygy pozmak", btnCancel: "Yza", btnSave: "Ýazdyrmak", checkPing: "Ping barlamak"
+            }
+        };
+
+        // Сохранение данных
+        function saveToStorage() {
+            localStorage.setItem('vpn_subs', JSON.stringify(subscriptions));
+            renderSubscriptions();
         }
 
-        // Логика обработки при нажатии кнопки "Создать"
-        function processCreation() {
-            const code = document.getElementById('vpnCode').value || '';
-            const user = document.getElementById('userName').value || 'User';
-            const title = document.getElementById('subTitle').value || 'User Information';
-            const date = document.getElementById('expDate').value || '∞';
+        // Рендеринг карточек клиентов
+        function renderSubscriptions() {
+            const container = document.getElementById('subscriptionsContainer');
+            container.innerHTML = "";
 
-            // Генерируем текст подписки для черного экрана (Фото 3)
-            rawConfigText = 
-`# profile-title: ${title}
-#!name=${title}
-# profile-update-interval: 1
-# profile-web-page-url: https://max.ru
-# support-url: https://max.ru
-# subscription-userinfo: upload=0; download=0; total=0
+            if(subscriptions.length === 0) {
+                container.innerHTML = "<div style='color:#777; font-size:14px; text-align:center; padding:10px;'>Нет активных подписок</div>";
+                return;
+            }
 
-${code}`;
-
-            // Заполняем данными Панель с лимитами (Фото 2)
-            document.getElementById('displayTitle').innerText = title;
-            document.getElementById('displayUser').innerText = user;
-            document.getElementById('displayDate').innerText = date;
-            
-            // Заполняем список кодов построчно
-            const listContainer = document.getElementById('displayCodesList');
-            listContainer.innerHTML = "";
-            const lines = code.split('\n');
-            lines.forEach(line => {
-                if(line.trim() !== "") {
-                    const li = document.createElement('li');
-                    li.className = "link-item";
-                    li.innerText = line;
-                    listContainer.appendChild(li);
-                }
+            subscriptions.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = `sub-card ${sub.isBlocked ? 'blocked' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-username">${sub.username} ${sub.isBlocked ? '🛑' : ''}</div>
+                        <div class="card-actions">
+                            <button class="icon-btn" onclick="copySubscriptionLink('${sub.id}')" title="Копировать ссылку">📋</button>
+                            <button class="icon-btn" onclick="openEditModal('${sub.id}')" title="Изменить">✏️</button>
+                        </div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar-text">_______________________________</div>
+                        <div class="progress-bar-text">${sub.usedData}/${sub.isReset ? '∞ (Сброшено)' : '∞'}</div>
+                        <div class="progress-line"></div>
+                    </div>
+                    <button class="card-open-btn" onclick="openClientScreen('${sub.id}')">Открыть</button>
+                `;
+                container.appendChild(card);
             });
+        }
 
-            // Генерируем уникальную ссылку, кодируя данные в URL-адрес страницы
+        // Добавление новой подписки
+        function addNewSubscription() {
+            const username = document.getElementById('newUsername').value.trim();
+            const title = document.getElementById('newTitle').value.trim() || 'User Information';
+            const date = document.getElementById('newDate').value.trim() || '01.01.2033';
+            const code = document.getElementById('newCode').value.trim();
+
+            if(!username || !code) {
+                alert("Заполните поля имени пользователя и кода!");
+                return;
+            }
+
+            const newSub = {
+                id: 'sub_' + Date.now(),
+                username: username,
+                title: title,
+                date: date,
+                code: code,
+                webSite: 'https://max.ru',
+                supportSite: 'https://max.ru',
+                isBlocked: false,
+                isReset: false,
+                usedData: '0B'
+            };
+
+            subscriptions.push(newSub);
+            saveToStorage();
+
+            // Очистка формы
+            document.getElementById('newUsername').value = "";
+            document.getElementById('newCode').value = "";
+        }
+
+        // Копирование уникальной интернет-ссылки подписки
+        function copySubscriptionLink(id) {
+            const sub = subscriptions.find(s => s.id === id);
+            if(!sub) return;
             const currentUrl = window.location.href.split('?')[0];
-            const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify({title, user, date, code}))));
-            const finalGeneratedUrl = currentUrl + "?data=" + encodedData;
-
-            // Выводим ссылку на экран и показываем новые кнопки
-            document.getElementById('generatedUrl').innerText = finalGeneratedUrl;
-            document.getElementById('linkOutput').style.display = 'block';
-        }
-
-        // Кнопка "Открыть" — выводит всё на черный фон, как на фото 3
-        function openBlackScreen() {
-            const blackScreen = document.getElementById('blackScreen');
-            blackScreen.innerText = rawConfigText;
-            blackScreen.style.display = 'block';
+            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(sub))));
+            const finalUrl = `${currentUrl}?subData=${encoded}`;
             
-            // Клик по черному экрану закроет его обратно
-            blackScreen.onclick = function() {
-                blackScreen.style.display = 'none';
-            }
-        }
-
-        // Кнопка "Копировать Ссылку"
-        function copyUrlToClipboard() {
-            const urlText = document.getElementById('generatedUrl').innerText;
-            navigator.clipboard.writeText(urlText).then(() => {
-                alert('Ссылка скопирована!');
+            navigator.clipboard.writeText(finalUrl).then(() => {
+                alert(`Ссылка для ${sub.username} успешно скопирована!`);
             });
         }
-
-        // Автоматическая загрузка панели, если перешли по сгенерированной ссылке
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const dataParam = urlParams.get('data');
-            if (dataParam) {
-                try {
-                    const decodedData = JSON.parse(decodeURIComponent(escape(atob(dataParam))));
-                    
-                    document.getElementById('startScreen').style.display = 'none';
-                    document.getElementById('generatorBlock').style.display = 'none';
-                    
-                    document.getElementById('displayTitle').innerText = decodedData.title;
-                    document.getElementById('displayUser').innerText = decodedData.user;
-                    document.getElementById('displayDate').innerText = decodedData.date;
-                    
-                    const listContainer = document.getElementById('displayCodesList');
-                    listContainer.innerHTML = "";
-                    const lines = decodedData.code.split('\n');
-                    lines.forEach(line => {
-                        if(line.trim() !== "") {
-                            const li = document.createElement('li');
-                            li.className = "link-item";
-                            li.innerText = line;
-                            listContainer.appendChild(li);
-                        }
-                    });
-                    
-                    document.getElementById('finalPanel').style.display = 'block';
-                } catch(e) {
-                    console.error("Ошибка разбора ссылки подписки");
-                }
-            }
-        }
-    </script>
-
-</body>
-</html>
+    
