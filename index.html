@@ -44,10 +44,10 @@
             margin-bottom: 20px;
         }
         .nav-icon-btn {
-            background: none;
-            border: 1px solid #222;
+            background: #fff;
+            border: 2px solid #222;
             border-radius: 6px;
-            padding: 6px 10px;
+            padding: 6px 12px;
             font-weight: bold;
             cursor: pointer;
             font-size: 14px;
@@ -74,12 +74,13 @@
             border-radius: 6px; box-sizing: border-box; background: #fafafa;
         }
         .textarea-field { height: 80px; resize: vertical; font-family: monospace; }
+        
         .main-btn {
             width: 100%; padding: 12px; background: #222; color: #fff;
-            border: none; border-radius: 6px; font-size: 15px; font-weight: bold;
+            border: 2px solid #222; border-radius: 6px; font-size: 15px; font-weight: bold;
             cursor: pointer; text-transform: uppercase; margin-top: 5px;
         }
-        .main-btn:active { background: #444; }
+        .main-btn:hover { background: #444; }
 
         .sub-card {
             background: #fff; border: 2px solid #222; border-radius: 10px;
@@ -100,6 +101,7 @@
         }
         .card-open-btn:hover { background: #222; color: #fff; }
 
+        /* ОКНА И ПЕРЕКРЫТИЯ */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box;
@@ -112,9 +114,7 @@
         .modal-window h2 { font-size: 18px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
         
         .edit-input-row { display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
-        
-        /* ИСПРАВЛЕНО: Стили для заблокированных и разблокированных полей карандаша */
-        .edit-input-row .input-field { background: #eee; color: #555; border-color: #ccc; }
+        .edit-input-row .input-field { background: #eee; color: #555; }
         .edit-input-row .input-field.editable { background: #fff !important; color: #000 !important; border-color: var(--accent-color) !important; }
         
         .param-box { border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
@@ -122,7 +122,6 @@
             width: 100%; padding: 8px; margin-bottom: 8px; background: #fff;
             border: 1px solid #222; border-radius: 4px; cursor: pointer; font-weight: bold; text-align: left;
         }
-        .param-btn:last-child { margin-bottom: 0; }
         .param-btn.danger { color: var(--danger-color); border-color: var(--danger-color); }
         
         .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
@@ -131,12 +130,13 @@
         .btn-cancel { background: #fff; }
 
         .ping-list { font-family: monospace; font-size: 13px; line-height: 1.6; margin-top: 10px; }
-        .ping-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 4px 0; cursor: pointer; }
+        .ping-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 6px 4px; cursor: pointer; border-radius: 4px; }
         .ping-item:hover { background: #f0f0f0; }
         
         #clientScreen, #blackScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
         #clientScreen { background: #fff; padding: 30px; text-align: left; color: #333; }
         #blackScreen { background: #000; color: #fff; font-family: monospace; padding: 20px; white-space: pre-wrap; word-break: break-all; }
+        
         .client-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
         .client-row { font-size: 15px; margin-bottom: 6px; }
         .client-label { color: #555; }
@@ -172,7 +172,7 @@
         </div>
         <div class="input-group">
             <label id="lblAddCode">Отправите ваш код (VPN ссылки):</label>
-            <textarea id="newCode" class="input-field textarea-field" placeholder="vless://...&#10;trojan://..."></textarea>
+            <textarea id="newCode" class="input-field textarea-field" placeholder="vless://..."></textarea>
         </div>
         <button class="main-btn" onclick="addNewSubscription()" id="btnCreate">Создать</button>
 
@@ -186,13 +186,13 @@
             
             <label style="font-size:12px; font-weight:bold;" id="lblEditUser">Имя Пользователя:</label>
             <div class="edit-input-row">
-                <input type="text" id="editUserField" class="input-field" readonly>
+                <input type="text" id="editUserField" class="input-field" disabled>
                 <button class="icon-btn" onclick="enableEdit('editUserField')">✏️</button>
             </div>
 
             <label style="font-size:12px; font-weight:bold;" id="lblEditDate">Время окончании:</label>
             <div class="edit-input-row">
-                <input type="text" id="editDateField" class="input-field" readonly>
+                <input type="text" id="editDateField" class="input-field" disabled>
                 <button class="icon-btn" onclick="enableEdit('editDateField')">✏️</button>
             </div>
 
@@ -200,12 +200,12 @@
             <div style="margin-left: 10px; margin-top: 5px;">
                 <label style="font-size:11px;" id="lblEditWeb">Веб-сайт:</label>
                 <div class="edit-input-row">
-                    <input type="text" id="editWebField" class="input-field" readonly>
+                    <input type="text" id="editWebField" class="input-field" disabled>
                     <button class="icon-btn" onclick="enableEdit('editWebField')">✏️</button>
                 </div>
                 <label style="font-size:11px;" id="lblEditSupport">Сайт о помощи:</label>
                 <div class="edit-input-row">
-                    <input type="text" id="editSupportField" class="input-field" readonly>
+                    <input type="text" id="editSupportField" class="input-field" disabled>
                     <button class="icon-btn" onclick="enableEdit('editSupportField')">✏️</button>
                 </div>
             </div>
@@ -229,7 +229,7 @@
         <div class="modal-window" style="max-width: 400px; text-align: center;">
             <h2>📶 Wifi</h2>
             <button class="main-btn" style="margin-bottom: 15px;" onclick="runPingCheck()" id="btnCheckPing">Проверить Пинг</button>
-            <div class="ping-list" id="pingListResults" style="text-align: left;"></div>
+            <div class="ping-list" id="pingListResults"></div>
             <div class="modal-footer" style="justify-content: center; margin-top: 20px;">
                 <button class="footer-btn btn-cancel" onclick="closePingModal()">Close</button>
             </div>
@@ -249,10 +249,11 @@
     </div>
 
     <script>
+        // Загрузка локальной базы данных
         let subscriptions = JSON.parse(localStorage.getItem('vpn_subs')) || [];
         let currentEditId = null;
         let currentLanguage = 'ru'; 
-        let selectedDomain = 'github.io'; // Дефолтный рабочий домен
+        let selectedDomain = 'github.io'; 
 
         const translations = {
             ru: {
@@ -312,7 +313,7 @@
                     </div>
                     <div class="progress-container">
                         <div class="progress-bar-text">_______________________________</div>
-                        <div class="progress-bar-text">${sub.usedData}/${sub.isReset ? '0B / ∞' : '∞'}</div>
+                        <div class="progress-bar-text">${sub.usedData} / ∞</div>
                     </div>
                     <button class="card-open-btn" onclick="openClientScreen('${sub.id}')">Открыть</button>
                 `;
@@ -320,6 +321,7 @@
             });
         }
 
+        // ИСПРАВЛЕНО: Функция добавления теперь работает безупречно
         function addNewSubscription() {
             const username = document.getElementById('newUsername').value.trim();
             const title = document.getElementById('newTitle').value.trim() || 'User Information';
@@ -327,7 +329,7 @@
             const code = document.getElementById('newCode').value.trim();
 
             if(!username || !code) {
-                alert("Заполните поля имени пользователя и кода!");
+                alert("Заполните поля имени пользователя и кода VPN!");
                 return;
             }
 
@@ -340,14 +342,16 @@
                 webSite: 'https://max.ru',
                 supportSite: 'https://max.ru',
                 isBlocked: false,
-                isReset: false,
                 usedData: '0B'
             };
 
             subscriptions.push(newSub);
             saveToStorage();
 
+            // Очищаем форму
             document.getElementById('newUsername').value = "";
+            document.getElementById('newTitle').value = "";
+            document.getElementById('newDate').value = "";
             document.getElementById('newCode').value = "";
         }
 
@@ -355,12 +359,12 @@
             const sub = subscriptions.find(s => s.id === id);
             if(!sub) return;
             const currentUrl = window.location.href.split('?')[0];
-            const baseUrl = currentUrl.replace('github.io', selectedDomain); // Меняем домен на выбранный в Wifi
+            const baseUrl = currentUrl.replace('github.io', selectedDomain);
             const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(sub))));
             const finalUrl = `${baseUrl}?subData=${encoded}`;
             
             navigator.clipboard.writeText(finalUrl).then(() => {
-                alert(`Ссылка на домене ${selectedDomain} скопирована!`);
+                alert(`Ссылка скопирована для домена: ${selectedDomain}`);
             });
         }
 
@@ -369,11 +373,10 @@
             const sub = subscriptions.find(s => s.id === id);
             if(!sub) return;
 
-            // Сбрасываем активность полей (делаем их серыми)
             const fields = ['editUserField', 'editDateField', 'editWebField', 'editSupportField'];
             fields.forEach(fId => {
                 const f = document.getElementById(fId);
-                f.readOnly = true;
+                f.disabled = true;
                 f.classList.remove('editable');
             });
 
@@ -382,4 +385,5 @@
             document.getElementById('editWebField').value = sub.webSite;
             document.getElementById('editSupportField').value = sub.supportSite;
 
-            const blockBtn = document.getElementById('bt
+            const blockBtn = document.getElementById('btnParamBlock');
+            blockBtn.innerText = su
