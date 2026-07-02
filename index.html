@@ -1,255 +1,4 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPN Admin Panel</title>
-    <style>
-        :root {
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --border-color: #cccccc;
-            --accent-color: #2ea44f;
-            --danger-color: #cb2431;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        .panel-container {
-            width: 100%;
-            max-width: 550px;
-            background: var(--card-bg);
-            border: 2px solid #222;
-            border-radius: 14px;
-            padding: 20px;
-            box-sizing: border-box;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        .top-navbar {
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            border-bottom: 2px solid #222;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .nav-icon-btn {
-            background: #fff;
-            border: 2px solid #222;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .nav-icon-btn:hover { background: #eee; }
-
-        h1 { font-size: 22px; text-align: center; margin: 10px 0 20px 0; text-transform: uppercase; }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 25px 0 15px 0;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 5px;
-        }
-        
-        .input-group { margin-bottom: 12px; text-align: left; }
-        .input-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; }
-        .input-field {
-            width: 100%; padding: 10px; font-size: 14px; border: 2px solid #222;
-            border-radius: 6px; box-sizing: border-box; background: #fafafa;
-        }
-        .textarea-field { height: 80px; resize: vertical; font-family: monospace; }
-        
-        .main-btn {
-            width: 100%; padding: 12px; background: #222; color: #fff;
-            border: 2px solid #222; border-radius: 6px; font-size: 15px; font-weight: bold;
-            cursor: pointer; text-transform: uppercase; margin-top: 5px;
-        }
-        .main-btn:hover { background: #444; }
-
-        .sub-card {
-            background: #fff; border: 2px solid #222; border-radius: 10px;
-            padding: 15px; margin-bottom: 15px; text-align: left; position: relative;
-        }
-        .sub-card.blocked { background: #ffeef0; border-color: var(--danger-color); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .card-username { font-weight: bold; font-size: 16px; word-break: break-all; }
-        .card-actions { display: flex; gap: 12px; }
-        .icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 2px; }
-        
-        .progress-container { margin-bottom: 12px; }
-        .progress-bar-text { display: flex; justify-content: center; font-size: 12px; font-family: monospace; margin-bottom: 2px; }
-        
-        .card-open-btn {
-            width: 100%; padding: 8px; background: #fff; border: 2px solid #222;
-            border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center;
-        }
-        .card-open-btn:hover { background: #222; color: #fff; }
-
-        /* ОКНА И ПЕРЕКРЫТИЯ */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box;
-        }
-        .modal-window {
-            background: #fff; border: 2px solid #222; border-radius: 12px;
-            padding: 20px; width: 100%; max-width: 450px; box-sizing: border-box;
-            max-height: 90vh; overflow-y: auto; text-align: left;
-        }
-        .modal-window h2 { font-size: 18px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
-        
-        .edit-input-row { display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
-        .edit-input-row .input-field { background: #eee; color: #555; }
-        .edit-input-row .input-field.editable { background: #fff !important; color: #000 !important; border-color: var(--accent-color) !important; }
-        
-        .param-box { border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
-        .param-btn {
-            width: 100%; padding: 8px; margin-bottom: 8px; background: #fff;
-            border: 1px solid #222; border-radius: 4px; cursor: pointer; font-weight: bold; text-align: left;
-        }
-        .param-btn.danger { color: var(--danger-color); border-color: var(--danger-color); }
-        
-        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
-        .footer-btn { padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #222; }
-        .btn-save { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
-        .btn-cancel { background: #fff; }
-
-        .ping-list { font-family: monospace; font-size: 13px; line-height: 1.6; margin-top: 10px; }
-        .ping-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 6px 4px; cursor: pointer; border-radius: 4px; }
-        .ping-item:hover { background: #f0f0f0; }
-        
-        #clientScreen, #blackScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
-        #clientScreen { background: #fff; padding: 30px; text-align: left; color: #333; }
-        #blackScreen { background: #000; color: #fff; font-family: monospace; padding: 20px; white-space: pre-wrap; word-break: break-all; }
-        
-        .client-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
-        .client-row { font-size: 15px; margin-bottom: 6px; }
-        .client-label { color: #555; }
-        .client-links-title { font-weight: bold; margin-top: 25px; font-size: 16px; }
-        .client-list { list-style-type: disc; padding-left: 20px; }
-        .client-item { margin-bottom: 10px; word-break: break-all; font-family: monospace; font-size: 13px; }
-        .close-screen-btn { margin-top: 30px; padding: 10px 20px; font-weight: bold; cursor: pointer; background: #222; color: #fff; border: none; border-radius: 6px; }
-    </style>
-</head>
-<body>
-
-    <div id="blackScreen" onclick="closeBlackScreen()"></div>
-
-    <div class="panel-container" id="panelMain">
-        <div class="top-navbar">
-            <button class="nav-icon-btn" onclick="toggleLanguage()" id="langBtn">🌐 Русский</button>
-            <button class="nav-icon-btn" onclick="openPingModal()">📶 Wifi</button>
-        </div>
-
-        <h1 id="panelTitle">Панель управления</h1>
-        
-        <div class="input-group">
-            <label id="lblAddUser">Отправите ваш имя пользователя:</label>
-            <input type="text" id="newUsername" class="input-field" placeholder="User123">
-        </div>
-        <div class="input-group">
-            <label id="lblAddTitle">Отправите название для подписки:</label>
-            <input type="text" id="newTitle" class="input-field" placeholder="User Information">
-        </div>
-        <div class="input-group">
-            <label id="lblAddDate">Отправите время окончании для подписок:</label>
-            <input type="text" id="newDate" class="input-field" placeholder="01.01.2033">
-        </div>
-        <div class="input-group">
-            <label id="lblAddCode">Отправите ваш код (VPN ссылки):</label>
-            <textarea id="newCode" class="input-field textarea-field" placeholder="vless://..."></textarea>
-        </div>
-        <button class="main-btn" onclick="addNewSubscription()" id="btnCreate">Создать</button>
-
-        <div class="section-title" id="lblMySubs">Мои Подписки:</div>
-        <div id="subscriptionsContainer"></div>
-    </div>
-
-    <div class="modal-overlay" id="editModal">
-        <div class="modal-window">
-            <h2 id="modalEditTitle">Изменение подписки</h2>
-            
-            <label style="font-size:12px; font-weight:bold;" id="lblEditUser">Имя Пользователя:</label>
-            <div class="edit-input-row">
-                <input type="text" id="editUserField" class="input-field" disabled>
-                <button class="icon-btn" onclick="enableEdit('editUserField')">✏️</button>
-            </div>
-
-            <label style="font-size:12px; font-weight:bold;" id="lblEditDate">Время окончании:</label>
-            <div class="edit-input-row">
-                <input type="text" id="editDateField" class="input-field" disabled>
-                <button class="icon-btn" onclick="enableEdit('editDateField')">✏️</button>
-            </div>
-
-            <span style="font-size:12px; font-weight:bold;" id="lblEditSites">Веб-сайт и Сайт о помощи:</span>
-            <div style="margin-left: 10px; margin-top: 5px;">
-                <label style="font-size:11px;" id="lblEditWeb">Веб-сайт:</label>
-                <div class="edit-input-row">
-                    <input type="text" id="editWebField" class="input-field" disabled>
-                    <button class="icon-btn" onclick="enableEdit('editWebField')">✏️</button>
-                </div>
-                <label style="font-size:11px;" id="lblEditSupport">Сайт о помощи:</label>
-                <div class="edit-input-row">
-                    <input type="text" id="editSupportField" class="input-field" disabled>
-                    <button class="icon-btn" onclick="enableEdit('editSupportField')">✏️</button>
-                </div>
-            </div>
-
-            <div class="param-box">
-                <span style="font-size:12px; font-weight:bold; display:block; margin-bottom:8px;" id="lblParamsTitle">Параметры:</span>
-                <button class="param-btn" onclick="modalToggleBlock()" id="btnParamBlock">Заблокировать Подписку</button>
-                <button class="param-btn" onclick="modalResetData()" id="btnParamReset">Сбросить Подписку</button>
-                <button class="param-btn" onclick="modalChangeDomain()" id="btnParamDomain">Изменить Домен</button>
-                <button class="param-btn danger" onclick="modalDeleteSub()" id="btnParamDelete">Удалить Подписку</button>
-            </div>
-
-            <div class="modal-footer">
-                <button class="footer-btn btn-cancel" onclick="closeEditModal()" id="btnCancel">Отмена</button>
-                <button class="footer-btn btn-save" onclick="saveSubscriptionChanges()" id="btnSave">Сохранить</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="pingModal">
-        <div class="modal-window" style="max-width: 400px; text-align: center;">
-            <h2>📶 Wifi</h2>
-            <button class="main-btn" style="margin-bottom: 15px;" onclick="runPingCheck()" id="btnCheckPing">Проверить Пинг</button>
-            <div class="ping-list" id="pingListResults"></div>
-            <div class="modal-footer" style="justify-content: center; margin-top: 20px;">
-                <button class="footer-btn btn-cancel" onclick="closePingModal()">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="clientScreen">
-        <h1 class="client-title" id="cliPanelTitle">User Information</h1>
-        <div class="client-row"><span class="client-label">Username:</span> <span id="cliUsername"></span></div>
-        <div class="client-row"><span class="client-label">Status:</span> <span id="cliStatus">active</span></div>
-        <div class="client-row"><span class="client-label">Data Limit:</span> <span id="cliLimit">∞</span></div>
-        <div class="client-row"><span class="client-label">Data Used:</span> <span id="cliUsed">0B</span></div>
-        <div class="client-row"><span class="client-label">Expiration Date:</span> <span id="cliDate"></span></div>
-        <div class="client-links-title">Links:</div>
-        <ul class="client-list" id="cliLinksList"></ul>
-        <button class="close-screen-btn" onclick="closeClientScreen()">⬅ Back to Admin Panel</button>
-    </div>
-
     <script>
-        // Загрузка локальной базы данных
         let subscriptions = JSON.parse(localStorage.getItem('vpn_subs')) || [];
         let currentEditId = null;
         let currentLanguage = 'ru'; 
@@ -321,7 +70,6 @@
             });
         }
 
-        // ИСПРАВЛЕНО: Функция добавления теперь работает безупречно
         function addNewSubscription() {
             const username = document.getElementById('newUsername').value.trim();
             const title = document.getElementById('newTitle').value.trim() || 'User Information';
@@ -348,7 +96,6 @@
             subscriptions.push(newSub);
             saveToStorage();
 
-            // Очищаем форму
             document.getElementById('newUsername').value = "";
             document.getElementById('newTitle').value = "";
             document.getElementById('newDate').value = "";
@@ -386,4 +133,144 @@
             document.getElementById('editSupportField').value = sub.supportSite;
 
             const blockBtn = document.getElementById('btnParamBlock');
-            blockBtn.innerText = su
+            blockBtn.textContent = sub.isBlocked ? translations[currentLanguage].btnUnblock : translations[currentLanguage].btnBlock;
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditId = null;
+        }
+
+        function enableEdit(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.disabled = false;
+            field.classList.add('editable');
+            field.focus();
+        }
+
+        function saveSubscriptionChanges() {
+            if (!currentEditId) return;
+            const sub = subscriptions.find(s => s.id === currentEditId);
+            if (sub) {
+                sub.username = document.getElementById('editUserField').value.trim();
+                sub.date = document.getElementById('editDateField').value.trim();
+                sub.webSite = document.getElementById('editWebField').value.trim();
+                sub.supportSite = document.getElementById('editSupportField').value.trim();
+                saveToStorage();
+            }
+            closeEditModal();
+        }
+
+        function modalToggleBlock() {
+            if (!currentEditId) return;
+            const sub = subscriptions.find(s => s.id === currentEditId);
+            if (sub) {
+                sub.isBlocked = !sub.isBlocked;
+                saveToStorage();
+                const blockBtn = document.getElementById('btnParamBlock');
+                blockBtn.textContent = sub.isBlocked ? translations[currentLanguage].btnUnblock : translations[currentLanguage].btnBlock;
+            }
+        }
+
+        function modalResetData() {
+            if (!currentEditId) return;
+            const sub = subscriptions.find(s => s.id === currentEditId);
+            if (sub) {
+                sub.usedData = '0B';
+                saveToStorage();
+                alert("Использование данных сброшено.");
+            }
+        }
+
+        function modalChangeDomain() {
+            const domains = ['github.io', 'vless.net', 'vpn-config.com'];
+            let currentIndex = domains.indexOf(selectedDomain);
+            currentIndex = (currentIndex + 1) % domains.length;
+            selectedDomain = domains[currentIndex];
+            alert(`Выбран новый домен для ссылок: ${selectedDomain}`);
+        }
+
+        function modalDeleteSub() {
+            if (!currentEditId) return;
+            if (confirm("Вы уверены, что хотите удалить эту подписку?")) {
+                subscriptions = subscriptions.filter(s => s.id !== currentEditId);
+                saveToStorage();
+                closeEditModal();
+            }
+        }
+
+        function openPingModal() {
+            document.getElementById('pingModal').style.display = 'flex';
+        }
+
+        function closePingModal() {
+            document.getElementById('pingModal').style.display = 'none';
+        }
+
+        function runPingCheck() {
+            const results = document.getElementById('pingListResults');
+            results.innerHTML = "Проверка...";
+            setTimeout(() => {
+                results.innerHTML = `
+                    <div class="ping-item"><span>Server 1 (DE)</span><span>45ms</span></div>
+                    <div class="ping-item"><span>Server 2 (NL)</span><span>52ms</span></div>
+                    <div class="ping-item"><span>Server 3 (US)</span><span>120ms</span></div>
+                `;
+            }, 1000);
+        }
+
+        function openClientScreen(id) {
+            const sub = subscriptions.find(s => s.id === id);
+            if (!sub) return;
+            document.getElementById('cliUsername').textContent = sub.username;
+            document.getElementById('cliStatus').textContent = sub.isBlocked ? 'blocked' : 'active';
+            document.getElementById('cliDate').textContent = sub.date;
+            document.getElementById('cliUsed').textContent = sub.usedData;
+            
+            const list = document.getElementById('cliLinksList');
+            list.innerHTML = `<li class="client-item">${sub.code}</li>`;
+            
+            document.getElementById('clientScreen').style.display = 'block';
+        }
+
+        function closeClientScreen() {
+            document.getElementById('clientScreen').style.display = 'none';
+        }
+
+        function toggleLanguage() {
+            const langs = ['ru', 'en', 'tk'];
+            let idx = langs.indexOf(currentLanguage);
+            currentLanguage = langs[(idx + 1) % langs.length];
+            
+            const t = translations[currentLanguage];
+            document.getElementById('langBtn').textContent = currentLanguage === 'ru' ? '🌐 Русский' : currentLanguage === 'en' ? '🌐 English' : '🌐 Türkmençe';
+            
+            document.getElementById('panelTitle').textContent = t.title;
+            document.getElementById('lblMySubs').textContent = t.mySubs;
+            document.getElementById('btnCreate').textContent = t.create;
+            document.getElementById('lblAddUser').textContent = t.addUsr;
+            document.getElementById('lblAddTitle').textContent = t.addTitle;
+            document.getElementById('lblAddDate').textContent = t.addDate;
+            document.getElementById('lblAddCode').textContent = t.addCode;
+            
+            // Обновление текстов в модалке
+            document.getElementById('modalEditTitle').textContent = t.editTitle;
+            document.getElementById('lblEditUser').textContent = t.editUsr;
+            document.getElementById('lblEditDate').textContent = t.editDate;
+            document.getElementById('lblEditSites').textContent = t.editSites;
+            document.getElementById('lblParamsTitle').textContent = t.paramTitle;
+            document.getElementById('btnParamReset').textContent = t.btnReset;
+            document.getElementById('btnParamDomain').textContent = t.btnDomain;
+            document.getElementById('btnParamDelete').textContent = t.btnDelete;
+            document.getElementById('btnCancel').textContent = t.btnCancel;
+            document.getElementById('btnSave').textContent = t.btnSave;
+            document.getElementById('btnCheckPing').textContent = t.checkPing;
+        }
+
+        // Первичный рендер при загрузке страницы
+        renderSubscriptions();
+    </script>
+</body>
+</html>
